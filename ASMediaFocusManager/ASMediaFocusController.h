@@ -9,13 +9,17 @@
 #import <UIKit/UIKit.h>
 #import "ASImageScrollView.h"
 
+@class ASMediaFocusManager;
+
 @interface ASMediaFocusController : UIViewController
 
+@property (nonatomic, weak) ASMediaFocusManager *mediaFocusManager;
 @property (strong, nonatomic) ASImageScrollView *scrollView;
 @property (strong, nonatomic) IBOutlet UIImageView *mainImageView;
 @property (strong, nonatomic) IBOutlet UIView *contentView;
 @property (strong, nonatomic) IBOutlet UILabel *titleLabel;
 @property (strong, nonatomic) IBOutlet UIView *accessoryView;
+@property (nonatomic, weak) IBOutlet UIButton *deleteButton;
 @property (strong, nonatomic) UITapGestureRecognizer *doubleTapGesture;
 
 - (void)updateOrientationAnimated:(BOOL)animated;

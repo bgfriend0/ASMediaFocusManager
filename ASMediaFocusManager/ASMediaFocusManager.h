@@ -22,6 +22,8 @@
 - (NSURL *)mediaFocusManager:(ASMediaFocusManager *)mediaFocusManager mediaURLForView:(UIView *)view;
 // Returns the title for this media view. Return nil if you don't want any title to appear.
 - (NSString *)mediaFocusManager:(ASMediaFocusManager *)mediaFocusManager titleForView:(UIView *)view;
+// Called when user requests deletion of image
+- (void)mediaFocusManager:(ASMediaFocusManager *)mediaFocusManager didPressDeleteForView:(UIView *)view;
 
 @optional
 // Called when a focus view is about to be shown. For example, you might use this method to hide the status bar.
@@ -54,5 +56,8 @@
 
 - (void)installOnViews:(NSArray *)views;
 - (void)installOnView:(UIView *)view;
+
+// Private
+- (void)handleDeleteButtonPressed;
 
 @end

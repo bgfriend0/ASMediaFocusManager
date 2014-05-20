@@ -7,6 +7,7 @@
 //
 
 #import "ASMediaFocusController.h"
+#import "ASMediaFocusManager.h"
 #import <QuartzCore/QuartzCore.h>
 
 static NSTimeInterval const kDefaultOrientationAnimationDuration = 0.4;
@@ -35,6 +36,9 @@ static NSTimeInterval const kDefaultOrientationAnimationDuration = 0.4;
     self.titleLabel.layer.shadowOpacity = 1;
     self.titleLabel.layer.shadowOffset = CGSizeZero;
     self.titleLabel.layer.shadowRadius = 1;
+    self.deleteButton.layer.shadowOpacity = 1;
+    self.deleteButton.layer.shadowOffset = CGSizeZero;
+    self.deleteButton.layer.shadowRadius = 1;
     self.accessoryView.alpha = 0;
 }
 
@@ -254,6 +258,11 @@ static NSTimeInterval const kDefaultOrientationAnimationDuration = 0.4;
     {
         [self.scrollView scrollRectToVisible:frame animated:NO];
     }
+}
+
+- (IBAction)didPressDeleteButton:(id)sender
+{
+    [self.mediaFocusManager handleDeleteButtonPressed];
 }
 
 #pragma mark - UIScrollViewDelegate

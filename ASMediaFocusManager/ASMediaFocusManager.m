@@ -154,6 +154,7 @@ static CGFloat const kAnimationDuration = 0.5;
     viewController.titleLabel.text = [self.delegate mediaFocusManager:self titleForView:mediaView];
     viewController.mainImageView.image = image;
     viewController.mainImageView.contentMode = imageView.contentMode;
+    viewController.mediaFocusManager = self;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSURL *url;
@@ -396,6 +397,7 @@ static CGFloat const kAnimationDuration = 0.5;
                          contentView.bounds = (self.elasticAnimation?[self rectInsetsForRect:bounds ratio:kAnimateElasticSizeRatio]:bounds);
                          self.focusViewController.view.backgroundColor = [UIColor clearColor];
                          self.focusViewController.accessoryView.alpha = 0;
+                         self.focusViewController.deleteButton.alpha = 0.0f;
                      }
                      completion:^(BOOL finished) {
                          [UIView animateWithDuration:(self.elasticAnimation?self.animationDuration*kAnimateElasticDurationRatio/3:0)
@@ -434,5 +436,56 @@ static CGFloat const kAnimationDuration = 0.5;
                                                                }];
                                           }];
                      }];
+}
+
+#pragma mark - Private
+- (void)handleDeleteButtonPressed
+{
+    if ([self.delegate respondsToSelector:@selector(mediaFocusManager:didPressDeleteForView:)])
+        [self.delegate mediaFocusManager:self didPressDeleteForView:self.mediaView];
+
+    // Imitate handleDefocusGesture but throw image away instead of putting back into calling VC
+    NSTimeInterval duration;
+    duration = (self.animationDuration);
+
+    UIView *contentView;
+    contentView = self.focusViewController.mainImageView;
+
+    if(self.isZooming && self.gestureDisabledDuringZooming)
+        return;
+
+    [self uninstallZoomView];
+
+    [UIView
+     animateWithDuration:duration
+     animations:^{
+         if (self.delegate && [self.delegate respondsToSelector:@selector(mediaFocusManagerWillDisappear:)]) {
+             [self.delegate mediaFocusManagerWillDisappear:self];
+         }
+
+         // Rotation animation
+         if ([self.focusViewController.view.layer animationForKey:@"SpinAnimation"] == nil) {
+             CABasicAnimation* animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+             animation.fromValue = [NSNumber numberWithFloat:0.0f];
+             animation.toValue = [NSNumber numberWithFloat: 2*M_PI];
+             animation.duration = 3.0f;
+             animation.repeatCount = INFINITY;
+             [contentView.layer addAnimation:animation forKey:@"SpinAnimation"];
+         }
+
+
+         contentView.bounds = CGRectMake(0.0f, 0.0f, 80.0, 80.0f);
+         self.focusViewController.view.alpha = 0.0f;
+     }
+     completion:^(BOOL finished) {
+         [self.focusViewController.view removeFromSuperview];
+         [self.focusViewController removeFromParentViewController];
+         self.focusViewController = nil;
+
+         if (self.delegate && [self.delegate respondsToSelector:@selector(mediaFocusManagerDidDisappear:)])
+         {
+             [self.delegate mediaFocusManagerDidDisappear:self];
+         }
+     }];
 }
 @end
